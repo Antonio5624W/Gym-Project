@@ -23,7 +23,11 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
     
     // Panel Principal (Ahora está protegido 🔐)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    // Panel Principal limpio
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Nueva pantalla de Reportes Financieros
+    Route::get('/reportes', [DashboardController::class, 'reports'])->name('reports.index');
     // Gestión de Personal (Esto quita la pantalla roja de error 🛡️)
     Route::get('/registrar-personal', [UserController::class, 'create'])->name('users.create');
     Route::post('/registrar-personal', [UserController::class, 'store'])->name('users.store');

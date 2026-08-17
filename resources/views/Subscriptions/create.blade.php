@@ -16,13 +16,11 @@
 
                 <!-- Botones de navegación -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <!-- Accesos rápidos a la izquierda -->
                     <div>
                         <a href="{{ route('dashboard') }}" class="btn btn-secondary me-2">⬅ Volver al Panel</a>
                         <a href="{{ route('clients.create') }}" class="btn btn-outline-primary">👤 Nuevo Miembro</a>
                     </div>
 
-                    <!-- Botón de salir a la derecha -->
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-outline-danger">Cerrar Sesión</button>
@@ -43,24 +41,31 @@
                         <form action="{{ route('subscriptions.store') }}" method="POST">
                             @csrf
 
+                            <!-- AQUÍ ESTÁ LA NUEVA BARRA DE BÚSQUEDA DIRECTA -->
                             <div class="mb-3">
-                                <label class="form-label">Miembro</label>
-                                <select name="client_id" class="form-select" required>
-                                    <option value="">Seleccione un miembro...</option>
+                                <label class="form-label">Escribe el nombre del Miembro</label>
+                                
+                                <!-- 1. El campo visible donde el usuario escribe directo -->
+                                <input type="text" class="form-control" list="listaClientes" id="buscadorNombres" placeholder="Ej. Juan Pérez..." autocomplete="off" required>
+                                
+                                <!-- 2. La lista de sugerencias que autocompleta mientras escribe -->
+                                <datalist id="listaClientes">
                                     @foreach ($clients as $client)
-                                        <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                        <option data-id="{{ $client->id }}" value="{{ $client->name }}"></option>
                                     @endforeach
-                                </select>
+                                </datalist>
+
+                                <!-- 3. El campo invisible que guarda el ID real para la Base de Datos -->
+                                <input type="hidden" name="client_id" id="clienteIdOculto" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Tipo de Membresía</label>
                                 <select name="plan_id" class="form-select" required>
-                                    <option value="">Seleccione un plan...</option>
+                                    <option value="" disabled selected>Seleccione un plan...</option>
                                     @foreach ($plans as $plan)
                                         <option value="{{ $plan->id }}">
-                                            {{ $plan->name }} - ${{ $plan->price }} ({{ $plan->duration_days }}
-                                            días)
+                                            {{ $plan->name }} - ${{ $plan->price }} ({{ $plan->duration_days }} días)
                                         </option>
                                     @endforeach
                                 </select>
@@ -76,20 +81,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Script para ocultar alerta de éxito -->
     <script>
-        // Esperamos 4 segundos (4000 milisegundos)
         setTimeout(function() {
             let alerta = document.querySelector('.alert-success');
             if (alerta) {
-                // Hacemos que se desvanezca suavemente
                 alerta.style.transition = "opacity 0.5s ease";
                 alerta.style.opacity = "0";
-
-                // La eliminamos del código medio segundo después de desvanecerla
                 setTimeout(() => alerta.remove(), 500);
             }
         }, 4000);
     </script>
-</body>
 
+    <!-- Script súper ligero para conectar el Nombre escrito con su ID de la base de datos -->
+    <script>
+        const inputBuscador = document.getElementById('buscadorNombres');
+        const inputOculto = document.getElementById('clienteIdOculto');
+        const opciones = document.getElementById('listaClientes').options;
+
+        inputBuscador.addEventListener('input', function() {
+            inputOculto.value = ""; // Limpiamos por seguridad
+            
+            // Si el texto escrito coincide con un nombre, guardamos su ID en secreto
+            for (let i = 0; i < opciones.length; i++) {
+                if (opciones[i].value === inputBuscador.value) {
+                    inputOculto.value = opciones[i].getAttribute('data-id');
+                    break;
+                }
+            }
+        });
+    </script>
+</body>
 </html>
