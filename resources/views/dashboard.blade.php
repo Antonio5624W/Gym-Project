@@ -9,8 +9,13 @@
 
 <div class="container mt-5">
     
+    <!-- ENCABEZADO ACTUALIZADO CON EL NOMBRE DEL GIMNASIO -->
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2>👋 Bienvenido, {{ Auth::user()->name }}</h2>
+        <div>
+            <!-- Aquí el sistema imprime a qué gimnasio pertenece el usuario -->
+            <h5 class="text-muted mb-0">🏢 {{ Auth::user()->gym?->name ?? 'Mi Gimnasio' }}</h5>
+            <h2>👋 Bienvenido, {{ Auth::user()->name }}</h2>
+        </div>
         <div class="d-flex align-items-center gap-3">
             <span class="badge bg-secondary px-3 py-2">Rol: {{ strtoupper(Auth::user()->role) }}</span>
             <form action="{{ route('logout') }}" method="POST" class="m-0">
@@ -36,7 +41,6 @@
                 <div class="card-body py-4">
                     <h4 class="mb-3">📊 Reportes</h4>
                     <p class="text-muted">Corte de caja y ganancias.</p>
-                    <!-- Aquí está el enlace a tu nueva pantalla -->
                     <a href="{{ route('reports.index') }}" class="btn btn-info w-100 text-white">Ver Ventas</a>
                 </div>
             </div>

@@ -5,7 +5,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UserController; // <--- Importación clave agregada
+use App\Http\Controllers\UserController;
 
 // --- ZONA PÚBLICA (Cualquiera entra) ---
 Route::get('/', function () {
@@ -21,14 +21,16 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // --- ZONA PRIVADA (Protegida por 'auth') ---
 Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
     
-    // Panel Principal (Ahora está protegido 🔐)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Panel Principal limpio
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Nueva pantalla de Reportes Financieros
+    // Pantalla de Reportes Financieros y Descargas PDF
     Route::get('/reportes', [DashboardController::class, 'reports'])->name('reports.index');
-    // Gestión de Personal (Esto quita la pantalla roja de error 🛡️)
+    Route::get('/reportes/diario', [DashboardController::class, 'exportDaily'])->name('reports.daily');
+    Route::get('/reportes/semanal', [DashboardController::class, 'exportWeekly'])->name('reports.weekly');
+    Route::get('/reportes/mensual', [DashboardController::class, 'exportMonthly'])->name('reports.monthly');
+    
+    // Gestión de Personal
     Route::get('/registrar-personal', [UserController::class, 'create'])->name('users.create');
     Route::post('/registrar-personal', [UserController::class, 'store'])->name('users.store');
     

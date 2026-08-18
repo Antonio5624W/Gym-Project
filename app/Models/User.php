@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Traits\BelongsToGym; // <-- 1. Importamos tu Trait mágico
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, BelongsToGym; // <-- 2. Lo encendemos aquí
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'gym_id', // <-- 3. Damos permiso para guardar el ID del gimnasio
     ];
 
     /**
@@ -45,5 +47,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // <-- 4. El puente para conectar al Usuario con su Gimnasio
+    public function gym()
+    {
+        return $this->belongsTo(Gym::class);
     }
 }

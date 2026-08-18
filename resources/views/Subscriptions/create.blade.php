@@ -32,7 +32,12 @@
                         {{ session('success') }}
                     </div>
                 @endif
-
+                <!-- Alerta de Error (Cuando ya tiene membresía) -->
+                @if (session('error'))
+                    <div class="alert alert-danger fw-bold text-center">
+                        {{ session('error') }}
+                    </div>
+                @endif
                 <div class="card shadow">
                     <div class="card-header bg-success text-white">
                         <h4 class="mb-0">💲 Cobrar Membresía</h4>
@@ -44,10 +49,11 @@
                             <!-- AQUÍ ESTÁ LA NUEVA BARRA DE BÚSQUEDA DIRECTA -->
                             <div class="mb-3">
                                 <label class="form-label">Escribe el nombre del Miembro</label>
-                                
+
                                 <!-- 1. El campo visible donde el usuario escribe directo -->
-                                <input type="text" class="form-control" list="listaClientes" id="buscadorNombres" placeholder="Ej. Juan Pérez..." autocomplete="off" required>
-                                
+                                <input type="text" class="form-control" list="listaClientes" id="buscadorNombres"
+                                    placeholder="Ej. Juan Pérez..." autocomplete="off" required>
+
                                 <!-- 2. La lista de sugerencias que autocompleta mientras escribe -->
                                 <datalist id="listaClientes">
                                     @foreach ($clients as $client)
@@ -65,7 +71,8 @@
                                     <option value="" disabled selected>Seleccione un plan...</option>
                                     @foreach ($plans as $plan)
                                         <option value="{{ $plan->id }}">
-                                            {{ $plan->name }} - ${{ $plan->price }} ({{ $plan->duration_days }} días)
+                                            {{ $plan->name }} - ${{ $plan->price }} ({{ $plan->duration_days }}
+                                            días)
                                         </option>
                                     @endforeach
                                 </select>
@@ -82,15 +89,17 @@
         </div>
     </div>
 
-    <!-- Script para ocultar alerta de éxito -->
+    <!-- Script para ocultar CUALQUIER alerta (éxito o error) -->
     <script>
         setTimeout(function() {
-            let alerta = document.querySelector('.alert-success');
-            if (alerta) {
+            // querySelectorAll atrapa todas las alertas que existan en la pantalla
+            let alertas = document.querySelectorAll('.alert');
+
+            alertas.forEach(function(alerta) {
                 alerta.style.transition = "opacity 0.5s ease";
                 alerta.style.opacity = "0";
                 setTimeout(() => alerta.remove(), 500);
-            }
+            });
         }, 4000);
     </script>
 
@@ -102,7 +111,7 @@
 
         inputBuscador.addEventListener('input', function() {
             inputOculto.value = ""; // Limpiamos por seguridad
-            
+
             // Si el texto escrito coincide con un nombre, guardamos su ID en secreto
             for (let i = 0; i < opciones.length; i++) {
                 if (opciones[i].value === inputBuscador.value) {
@@ -113,4 +122,5 @@
         });
     </script>
 </body>
+
 </html>

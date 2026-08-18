@@ -18,21 +18,34 @@ class SubscriptionController extends Controller
         return view('subscriptions.create', compact('clients', 'plans'));
     }
 
-public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'client_id' => 'required',
             'plan_id' => 'required'
         ]);
 
-        $plan = Plan::find($request->plan_id);
+        // --- EL GUARDIA DE SEGURIDAD ---
+        $suscripcionActiva = Subscription::where('client_id', $request->client_id)
+            ->where('end_date', '>=', Carbon::now())
+            ->first();
 
+        if ($suscripcionActiva) {
+            $fecha = Carbon::parse($suscripcionActiva->end_date);
+            // Separamos el texto "a las" fuera de la función format()
+            $fechaVencimiento = $fecha->format('d/m/Y') . ' a las ' . $fecha->format('H:i');
+            
+            return redirect()->back()
+                ->with('error', '❌ Alto ahí: Este usuario ya cuenta con una membresía activa (' . $suscripcionActiva->plan->name . ') válida hasta el ' . $fechaVencimiento);
+        }
+        // -------------------------------
+        // -------------------------------
+
+        $plan = Plan::find($request->plan_id);
         $fechaInicio = Carbon::now();
-        
-        // Condición inteligente: Si el plan es de 1 día, caduca hoy a la medianoche.
-        // Si es de más días (como la mensualidad), se suman los días normales.
+
         if ($plan->duration_days <= 1) {
-            $fechaFin = Carbon::today()->endOfDay(); // Genera: 2026-08-13 23:59:59
+            $fechaFin = Carbon::today()->endOfDay();
         } else {
             $fechaFin = Carbon::now()->addDays($plan->duration_days);
         }
@@ -45,7 +58,6 @@ public function store(Request $request)
             'price' => $plan->price
         ]);
 
-        // Cambiamos el formato de salida a 'd-m-Y H:i' para ver la hora en pantalla
         return redirect()->route('subscriptions.create')
             ->with('success', '¡Pago registrado! El cliente tiene acceso hasta el ' . $fechaFin->format('d-m-Y') . ' a las ' . $fechaFin->format('H:i'));
     }

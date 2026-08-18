@@ -50,9 +50,10 @@
         <div class="card-body text-center">
             <p>Descarga el historial de movimientos financieros listos para imprimir.</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="#" class="btn btn-outline-success">📥 Corte Diario</a>
-                <a href="#" class="btn btn-outline-primary">📥 Reporte Semanal</a>
-                <a href="#" class="btn btn-outline-dark">📥 Reporte Mensual</a>
+                <!-- AQUÍ ESTÁ LA MAGIA: Las rutas ya están conectadas y con target="_blank" -->
+                <a href="{{ route('reports.daily') }}" class="btn btn-outline-success" target="_blank">📥 Corte Diario</a>
+                <a href="{{ route('reports.weekly') }}" class="btn btn-outline-primary" target="_blank">📥 Reporte Semanal</a>
+                <a href="{{ route('reports.monthly') }}" class="btn btn-outline-dark" target="_blank">📥 Reporte Mensual</a>
             </div>
         </div>
     </div>
